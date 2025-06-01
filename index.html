@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plano Alimentar Multiusuário</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div id="loginSection" class="loginSection">
+    <h2 class="login">Login</h2>
+    <div class="usuario">
+    <input type="text" id="usuarioInput" placeholder="Digite seu nome">
+    <button onclick="loginUsuario()" class="entrar">Entrar</button>
+  </div>
+  </div>
+
+  <div id="app" style="display:none;">
+    <h1>Olá, <span id="usuarioNome"></span>!</h1>
+    <button onclick="logout()">Sair</button>
+    <h2>Plano Alimentar</h2>
+    <div id="refeicoes"></div>
+    <div class="total" id="totalCalorias">Calorias consumidas: 0 kcal</div>
+
+    <h2>Resumo por Semana/Mês</h2>
+    <canvas id="graficoConsumo"></canvas>
+
+    <h2>Controle de Peso</h2>
+    <div id="pesos"></div>
+    <canvas id="graficoPeso"></canvas>
+
+    <h2>Editar Plano Alimentar</h2>
+    <input type="text" id="novaRefeicao" placeholder="Nova Refeição" />
+    <input type="time" id="horarioRefeicao" />
+    <button onclick="adicionarRefeicao()">Adicionar</button>
+    <div id="editarRefeicoes"></div>
+    <button onclick="salvarPlano()">Salvar Plano</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
