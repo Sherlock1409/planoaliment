@@ -2,24 +2,45 @@ let usuarioAtual = null;
 let dadosUsuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
 
 function loginUsuario() {
-  const nome = document.getElementById("usuarioInput").value.trim();
-  if (!nome) return alert("Digite um nome válido.");
+  const usuario = document.getElementById("usuarioInput").value.trim();
+  const senha = document.getElementById("senhaInput").value.trim();
 
-  if (!dadosUsuarios[nome]) {
-    dadosUsuarios[nome] = {
+  if (!usuario || !senha) {
+    return alert("Preencha o usuário e a senha.");
+  }
+
+  // Verifica se já existe o usuário
+  if (!dadosUsuarios[usuario]) {
+    // Criar novo usuário com senha
+    dadosUsuarios[usuario] = {
+      senha: senha,
       refeicoes: [],
       progresso: {},
       pesos: {}
     };
+    console.log("Novo usuário criado:", usuario);
+  } else {
+    // Usuário existe, verifica a senha
+    console.log("Usuário encontrado:", usuario);
+    console.log("Senha informada:", senha);
+    console.log("Senha salva:", dadosUsuarios[usuario].senha);
+
+    if (dadosUsuarios[usuario].senha !== senha) {
+      alert("Senha incorreta.");
+      return;
+    }
   }
 
-  usuarioAtual = nome;
+  usuarioAtual = usuario;
   localStorage.setItem("usuarios", JSON.stringify(dadosUsuarios));
+
   document.getElementById("loginSection").style.display = "none";
   document.getElementById("app").style.display = "block";
-  document.getElementById("usuarioNome").textContent = nome;
+  document.getElementById("usuarioNome").textContent = usuario;
   inicializarApp();
 }
+
+
 
 function logout() {
   usuarioAtual = null;
