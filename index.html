@@ -19,17 +19,18 @@
       <div class="usuario">
         <input type="text" id="usuarioInput" placeholder="Usuário" />
         <input type="password" id="senhaInput" placeholder="Senha" />
-        <button onclick="loginUsuario()" class="btn primary">Entrar</button>
-        <p class="ce">Ou crie uma conta:</p>
+        <button onclick="loginUsuario()" class="entrar btn">Entrar</button>
+        <p>Ou crie uma conta:</p>
         <input type="text" id="novoUsuarioInput" placeholder="Novo usuário" />
         <input type="password" id="novaSenhaInput" placeholder="Nova senha" />
-        <button onclick="criarUsuario()" class="btn secondary">Criar Usuário</button>
+        <button onclick="criarUsuario()" class="entrar btn">Criar Usuário</button>
       </div>
     </div>
 
     <div id="app" style="display: none">
       <h1>Olá, <span id="usuarioNome"></span>!</h1>
       <button onclick="logout()" class="btn logout">Sair</button>
+      <button id="btnAlternarEdicao" class="btn" style="margin-left: 10px;">Editar Refeição</button>
 
       <h2>Plano Alimentar</h2>
       <div id="refeicoes"></div>
@@ -43,11 +44,11 @@
       <canvas id="graficoPeso"></canvas>
 
       <h2>Editar Plano Alimentar</h2>
-      <input type="text" id="novaRefeicao" placeholder="Nova Refeição" class="input-field"/>
-      <input type="time" id="horarioRefeicao" class="input-field"/>
-      <button onclick="adicionarRefeicao()" class="btn primary">Adicionar</button>
+      <input type="text" id="novaRefeicao" placeholder="Nova Refeição" />
+      <input type="time" id="horarioRefeicao" />
+      <button onclick="adicionarRefeicao()" class="btn">Adicionar</button>
       <div id="editarRefeicoes"></div>
-      <button onclick="salvarPlano()" class="btn primary">Salvar Plano</button>
+      <button onclick="salvarPlano()" class="btn salvar">Salvar Plano</button>
     </div>
 
     <script src="script.js"></script>
