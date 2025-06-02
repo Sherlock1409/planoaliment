@@ -1,51 +1,64 @@
 let usuarioAtual = null;
 let dadosUsuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
 
+// Função para login - agora verifica usuário e senha
 function loginUsuario() {
-  const usuario = document.getElementById("usuarioInput").value.trim();
-  const senha = document.getElementById("senhaInput").value.trim();
+  const nome = document.getElementById("usuarioInput").value.trim();
+  const senha = document.getElementById("senhaInput").value;
 
-  if (!usuario || !senha) {
-    return alert("Preencha o usuário e a senha.");
+  if (!nome || !senha) {
+    return alert("Por favor, preencha usuário e senha.");
   }
 
-  // Verifica se já existe o usuário
-  if (!dadosUsuarios[usuario]) {
-    // Criar novo usuário com senha
-    dadosUsuarios[usuario] = {
-      senha: senha,
-      refeicoes: [],
-      progresso: {},
-      pesos: {}
-    };
-    console.log("Novo usuário criado:", usuario);
-  } else {
-    // Usuário existe, verifica a senha
-    console.log("Usuário encontrado:", usuario);
-    console.log("Senha informada:", senha);
-    console.log("Senha salva:", dadosUsuarios[usuario].senha);
-
-    if (dadosUsuarios[usuario].senha !== senha) {
-      alert("Senha incorreta.");
-      return;
-    }
+  if (!dadosUsuarios[nome]) {
+    return alert("Usuário não encontrado. Crie uma conta.");
   }
 
-  usuarioAtual = usuario;
-  localStorage.setItem("usuarios", JSON.stringify(dadosUsuarios));
+  if (dadosUsuarios[nome].senha !== senha) {
+    return alert("Senha incorreta.");
+  }
 
+  usuarioAtual = nome;
   document.getElementById("loginSection").style.display = "none";
   document.getElementById("app").style.display = "block";
-  document.getElementById("usuarioNome").textContent = usuario;
+  document.getElementById("usuarioNome").textContent = nome;
   inicializarApp();
 }
 
+function criarUsuario() {
+  const novoNome = document.getElementById("novoUsuarioInput").value.trim();
+  const novaSenha = document.getElementById("novaSenhaInput").value;
 
+  if (!novoNome || !novaSenha) {
+    return alert("Preencha nome e senha para criar usuário.");
+  }
+
+  if (dadosUsuarios[novoNome]) {
+    return alert("Usuário já existe. Escolha outro nome.");
+  }
+
+  dadosUsuarios[novoNome] = {
+    senha: novaSenha,
+    refeicoes: [],
+    progresso: {},
+    pesos: {},
+    marcados: {}
+  };
+
+  localStorage.setItem("usuarios", JSON.stringify(dadosUsuarios));
+  alert("Usuário criado com sucesso! Agora faça login.");
+
+  document.getElementById("novoUsuarioInput").value = "";
+  document.getElementById("novaSenhaInput").value = "";
+}
 
 function logout() {
   usuarioAtual = null;
   document.getElementById("app").style.display = "none";
   document.getElementById("loginSection").style.display = "block";
+
+  document.getElementById("usuarioInput").value = "";
+  document.getElementById("senhaInput").value = "";
 }
 
 function getUserData() {
@@ -56,12 +69,11 @@ function salvarDados() {
   localStorage.setItem("usuarios", JSON.stringify(dadosUsuarios));
 }
 
-// ---------------- PLANO ------------------
-
 function adicionarRefeicao() {
   const nome = document.getElementById("novaRefeicao").value.trim();
   const horario = document.getElementById("horarioRefeicao").value;
   if (!nome) return alert("Informe o nome da refeição.");
+
   getUserData().refeicoes.push({ nome, horario, opcoes: [] });
   salvarDados();
   document.getElementById("novaRefeicao").value = "";
@@ -74,24 +86,61 @@ function renderizarPlano() {
   const container = document.getElementById("refeicoes");
   container.innerHTML = "";
   const refeicoes = getUserData().refeicoes;
+  const marcados = getUserData().marcados || {};
 
-  refeicoes.forEach(refeicao => {
+  refeicoes.forEach((refeicao, i) => {
     const div = document.createElement("div");
     div.className = "refeicao";
     const h = refeicao.horario ? ` (${refeicao.horario})` : "";
     const titulo = document.createElement("h3");
     titulo.textContent = refeicao.nome + h;
-    div.appendChild(titulo);
 
-    refeicao.opcoes.forEach(opcao => {
+    const btnExcluir = document.createElement("button");
+    btnExcluir.textContent = "Excluir Refeição";
+    btnExcluir.className = "btn logout";
+    btnExcluir.onclick = () => {
+      refeicoes.splice(i, 1);
+      salvarDados();
+      renderizarPlano();
+      mostrarEdicao();
+    };
+
+    div.appendChild(titulo);
+    div.appendChild(btnExcluir);
+
+    refeicao.opcoes.forEach((opcao, j) => {
       const label = document.createElement("label");
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.value = opcao.calorias;
-      checkbox.addEventListener("change", atualizarCalorias);
+
+      const hoje = new Date().toISOString().split("T")[0];
+      const key = `${i}-${j}-${hoje}`;
+      checkbox.checked = marcados[key] || false;
+
+      checkbox.addEventListener("change", () => {
+        marcados[key] = checkbox.checked;
+        getUserData().marcados = marcados;
+        salvarDados();
+        atualizarCalorias();
+      });
+
       label.appendChild(checkbox);
-      label.appendChild(document.createTextNode(`${opcao.nome} (${opcao.calorias} kcal)`));
+      label.appendChild(document.createTextNode(` ${opcao.nome} (${opcao.calorias} kcal)`));
+
+      const btnExcluirOpcao = document.createElement("button");
+      btnExcluirOpcao.textContent = "X";
+      btnExcluirOpcao.className = "btn logout";
+      btnExcluirOpcao.style.marginLeft = "10px";
+      btnExcluirOpcao.onclick = () => {
+        refeicao.opcoes.splice(j, 1);
+        salvarDados();
+        renderizarPlano();
+        mostrarEdicao();
+      };
+
       div.appendChild(label);
+      div.appendChild(btnExcluirOpcao);
       div.appendChild(document.createElement("br"));
     });
 
@@ -109,15 +158,22 @@ function mostrarEdicao() {
   refeicoes.forEach((refeicao, i) => {
     const div = document.createElement("div");
     div.className = "refeicao";
-    div.innerHTML = `<strong>${refeicao.nome}</strong> (${refeicao.horario || 'sem horário'})<br/>`;
+
+    const titulo = document.createElement("h3");
+    titulo.innerHTML = `<strong>${refeicao.nome}</strong> (${refeicao.horario || 'sem horário'})`;
+    div.appendChild(titulo);
 
     const inputNome = document.createElement("input");
     inputNome.placeholder = "Alimento";
+    inputNome.className = "input-field";
     const inputCal = document.createElement("input");
     inputCal.placeholder = "Calorias";
     inputCal.type = "number";
+    inputCal.className = "input-field";
     const btn = document.createElement("button");
     btn.textContent = "Adicionar alimento";
+    btn.className = "btn";
+
     btn.onclick = () => {
       if (inputNome.value && inputCal.value) {
         refeicao.opcoes.push({
@@ -144,17 +200,26 @@ function salvarPlano() {
   alert("Plano salvo!");
 }
 
-// ---------------- CALORIAS ------------------
-
 function atualizarCalorias() {
-  const checkboxes = document.querySelectorAll("input[type=checkbox]:checked");
+  const marcados = getUserData().marcados || {};
+  const hoje = new Date().toISOString().split("T")[0];
   let total = 0;
-  checkboxes.forEach(cb => total += parseInt(cb.value));
+
+  Object.keys(marcados).forEach(key => {
+    if (key.endsWith(hoje) && marcados[key]) {
+      const parts = key.split("-");
+      const i = parseInt(parts[0]);
+      const j = parseInt(parts[1]);
+      const refeicao = getUserData().refeicoes[i];
+      if (refeicao && refeicao.opcoes[j]) {
+        total += refeicao.opcoes[j].calorias;
+      }
+    }
+  });
+
   document.getElementById("totalCalorias").textContent = `Calorias consumidas: ${total} kcal`;
   salvarProgresso(total);
 }
-
-// ---------------- PROGRESSO ------------------
 
 function salvarProgresso(calorias) {
   const hoje = new Date().toISOString().split("T")[0];
@@ -176,28 +241,29 @@ function atualizarGraficoConsumo() {
       datasets: [{
         label: "Calorias por dia",
         data: valores,
-        backgroundColor: "rgba(75,192,192,0.6)"
+        backgroundColor: "rgba(46, 125, 50, 0.7)" // verde
       }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true }
+      }
     }
   });
 }
-
-// ---------------- PESO ------------------
 
 function mostrarPesos() {
   const container = document.getElementById("pesos");
   container.innerHTML = "";
   const pesos = getUserData().pesos;
-  const meses = [
-    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-  ];
+  const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
   meses.forEach(mes => {
     const input = document.createElement("input");
     input.type = "number";
     input.placeholder = `${mes} - kg`;
     input.value = pesos[mes] || "";
+    input.className = "input-field";
     input.onchange = () => {
       pesos[mes] = parseFloat(input.value);
       salvarDados();
@@ -205,6 +271,7 @@ function mostrarPesos() {
     };
     container.appendChild(input);
   });
+  atualizarGraficoPeso();
 }
 
 function atualizarGraficoPeso() {
@@ -220,16 +287,18 @@ function atualizarGraficoPeso() {
       datasets: [{
         label: "Peso (kg)",
         data: valores,
-        borderColor: "rgba(255,99,132,0.8)",
-        backgroundColor: "rgba(255,99,132,0.2)",
-        fill: true,
-        tension: 0.3
+        fill: false,
+        borderColor: "rgba(46, 125, 50, 0.8)",
+        tension: 0.2
       }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: false }
+      }
     }
   });
 }
-
-// ---------------- INICIALIZAR ------------------
 
 function inicializarApp() {
   renderizarPlano();
@@ -238,3 +307,14 @@ function inicializarApp() {
   atualizarGraficoConsumo();
   atualizarGraficoPeso();
 }
+
+// Inicialização - esconde app e mostra login
+document.getElementById("app").style.display = "none";
+document.getElementById("loginSection").style.display = "block";
+
+// Botões
+document.querySelector(".entrar").onclick = loginUsuario;
+document.getElementById("criarUsuarioBtn").onclick = criarUsuario;
+document.getElementById("logoutBtn").onclick = logout;
+document.getElementById("adicionarRefeicaoBtn").onclick = adicionarRefeicao;
+document.getElementById("salvarPlanoBtn").onclick = salvarPlano;

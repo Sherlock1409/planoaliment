@@ -1,54 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Plano Alimentar Multiusuário</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plano Alimentar Multiusuário</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div id="loginSection" class="loginSection">
+      <h2 class="login">Login</h2>
+      <div class="usuario">
+        <input type="text" id="usuarioInput" placeholder="Usuário" />
+        <input type="password" id="senhaInput" placeholder="Senha" />
+        <button onclick="loginUsuario()" class="btn primary">Entrar</button>
+        <p class="ce">Ou crie uma conta:</p>
+        <input type="text" id="novoUsuarioInput" placeholder="Novo usuário" />
+        <input type="password" id="novaSenhaInput" placeholder="Nova senha" />
+        <button onclick="criarUsuario()" class="btn secondary">Criar Usuário</button>
+      </div>
+    </div>
 
-  <main>
-  <div id="loginSection" class="loginSection">
-    <div>
-    <img src="/user_11663046.png" class="imglogo"alt="">
-    <h2 class="login">Login</h2>
-  </div>
-    <div class="usuario">
-    <input type="text" id="usuarioInput" placeholder="Usuário" class="nome">
-<input type="password" id="senhaInput" placeholder="Senha" class="nome">
-<button onclick="loginUsuario()" class="entrar">Entrar</button>
+    <div id="app" style="display: none">
+      <h1>Olá, <span id="usuarioNome"></span>!</h1>
+      <button onclick="logout()" class="btn logout">Sair</button>
 
-  </div>
-  </div>
-</main>
+      <h2>Plano Alimentar</h2>
+      <div id="refeicoes"></div>
+      <div class="total" id="totalCalorias">Calorias consumidas: 0 kcal</div>
 
-  <div id="app" style="display:none;">
-    <h1>Olá, <span id="usuarioNome"></span>!</h1>
-    <button onclick="logout()">Sair</button>
-    <h2>Plano Alimentar</h2>
-    <div id="refeicoes"></div>
-    <div class="total" id="totalCalorias">Calorias consumidas: 0 kcal</div>
+      <h2>Resumo por Semana/Mês</h2>
+      <canvas id="graficoConsumo"></canvas>
 
-    <h2>Resumo por Semana/Mês</h2>
-    <canvas id="graficoConsumo"></canvas>
+      <h2>Controle de Peso</h2>
+      <div id="pesos"></div>
+      <canvas id="graficoPeso"></canvas>
 
-    <h2>Controle de Peso</h2>
-    <div id="pesos"></div>
-    <canvas id="graficoPeso"></canvas>
+      <h2>Editar Plano Alimentar</h2>
+      <input type="text" id="novaRefeicao" placeholder="Nova Refeição" class="input-field"/>
+      <input type="time" id="horarioRefeicao" class="input-field"/>
+      <button onclick="adicionarRefeicao()" class="btn primary">Adicionar</button>
+      <div id="editarRefeicoes"></div>
+      <button onclick="salvarPlano()" class="btn primary">Salvar Plano</button>
+    </div>
 
-    <h2>Editar Plano Alimentar</h2>
-    <input type="text" id="novaRefeicao" placeholder="Nova Refeição" />
-    <input type="time" id="horarioRefeicao" />
-    <button onclick="adicionarRefeicao()">Adicionar</button>
-    <div id="editarRefeicoes"></div>
-    <button onclick="salvarPlano()">Salvar Plano</button>
-  </div>
-
-  <script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
